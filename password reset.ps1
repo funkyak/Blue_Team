@@ -1,16 +1,18 @@
-Import-Module Active Directory
-$Resetpassword = Import-Csv "C:\path_to_username_password_file.csv"
- #Store CSV file into $Resetpassword variable
+# Import ActiveDirectory module
+ Import-module ActiveDirectory
+# Grab list of users from a text file.
+ $ListOfUsers = Get-Content C:\Temp\userlist.txt
+ foreach ($user in $ListOfUsers) {
+     #Generate a 15-character random password.
+     $Password = -join ((33..126) | Get-Random -Count 15 | ForEach-Object { [char]$_ })
+     #Convert the password to secure string.
+     $NewPwd = ConvertTo-SecureString $Password -AsPlainText -Force
+     #Assign the new password to the user.
+     Set-ADAccountPassword $user -NewPassword $NewPwd -Reset
+     #Force user to change password at next logon.
+     Set-ADUser -Identity $user -ChangePasswordAtLogon $true
+     #Display userid and new password on the console.
+     Write-Host $user, $Password
+ }
  
-foreach ($User in $Resetpassword) {
-    #For each name or account in the CSV file $Resetpassword, reset the password with the Set-ADAccountPassword string below
-    $User.sAMAccountName
-    $User.Password
-        Set-ADAccountPassword -Identity $User.sAMAccountName -Reset -NewPassword (ConvertTo-SecureString $User.Password -AsPlainText -force)
-}
- Write-Host " Passwords changed "
- $total = ($Resetpassword).count
- $total
- Write-Host "Accounts passwords have been reset..."
  
- Get-ADUser -filter * -properties passwordlastset | sort-object samaccountname | select-object samaccountname, passwordlastset, passwordneverexpires | Out-GridView
