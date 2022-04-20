@@ -1,7 +1,7 @@
 # Import ActiveDirectory module
  Import-module ActiveDirectory
 # Grab list of users from a text file.
- $ListOfUsers = Get-Content C:\Temp\userlist.txt
+ $ListOfUsers = Get-Content C:\Users\Administrators\Desktop\Users.txt
  foreach ($user in $ListOfUsers) {
      #Generate a 15-character random password.
      $Password = -join ((33..126) | Get-Random -Count 15 | ForEach-Object { [char]$_ })
